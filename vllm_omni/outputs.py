@@ -53,6 +53,11 @@ class OmniModelRunnerOutput(ModelRunnerOutput):
     kv_extracted_req_ids: list[str] | None = None
     omni_connector_output: OmniConnectorOutput | None = None
 
+    @classmethod
+    def with_kv_conn_output_only(cls, kv_connector_output):
+        # vllm 0.22.0's ModelRunnerOutput lacks this factory; the multimodal AR path needs it.
+        return cls(req_ids=[], req_id_to_index={}, kv_connector_output=kv_connector_output)
+
 
 @dataclass
 class OmniRequestOutput:
