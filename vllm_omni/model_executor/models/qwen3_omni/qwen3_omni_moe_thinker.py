@@ -756,6 +756,10 @@ class Qwen3OmniMoeThinkerMultiModalProcessor(
         mm_item_counts = mm_items.get_all_counts()
         self._validate_mm_kwargs(mm_kwargs, mm_item_counts)
 
+        # TEMP diagnostic: trace image placeholder layout at prompt-update entry.
+        import sys as _S
+        print(f"[MM-TRACE entry] is_update_applied={is_update_applied} vstart={prompt_ids.count(151652)} vend={prompt_ids.count(151653)} img_pad={prompt_ids.count(151655)} len={len(prompt_ids)}", file=_S.stderr, flush=True)
+
         use_audio_in_video = False
         if "video" in mm_kwargs:
             non_none_items = [item for item in mm_kwargs["video"] if item is not None]
@@ -808,6 +812,8 @@ class Qwen3OmniMoeThinkerMultiModalProcessor(
                 mm_item_counts,
             )
 
+        # TEMP diagnostic: trace image placeholder layout at prompt-update exit.
+        print(f"[MM-TRACE exit] vstart={prompt_ids.count(151652)} vend={prompt_ids.count(151653)} img_pad={prompt_ids.count(151655)} len={len(prompt_ids)}", file=_S.stderr, flush=True)
         return prompt_ids, mm_placeholders
 
     def get_updates_use_audio_in_video(
