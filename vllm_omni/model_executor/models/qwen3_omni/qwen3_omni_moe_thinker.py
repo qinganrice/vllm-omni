@@ -1763,7 +1763,12 @@ class Qwen3OmniMoeThinkerForConditionalGeneration(
 
         llm_positions = np.concatenate(llm_pos_ids_list, axis=1).reshape(3, -1)
         if llm_positions.shape[1] != seq_len:
-            raise RuntimeError("Position ids length mismatch with input ids length")
+            # TEMP diagnostic: dump grids + actual pad count to locate the mismatch.
+            _feats = [(m, d) for _, m, d in self.iter_mm_features(mm_features)]
+            _pad = sum(1 for t in input_tokens if t == 151655)
+            raise RuntimeError(
+                f"POS-MISMATCH pos={llm_positions.shape[1]} seq_len={seq_len} img_pad_in_ids={_pad} feats={_feats}"
+            )
 
         mrope_position_delta = int(llm_positions.max()) + 1 - seq_len
         return torch.from_numpy(llm_positions), mrope_position_delta
