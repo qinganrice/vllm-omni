@@ -742,6 +742,21 @@ class Qwen3OmniMoeThinkerMultiModalProcessor(
             hf_inputs["audio_feature_lengths"] = torch.tensor(audio_num_frames)
         return hf_inputs
 
+    def _hf_processor_applies_updates(
+        self,
+        prompt_text: str,
+        mm_items: MultiModalDataItems,
+        hf_processor_mm_kwargs: Mapping[str, object],
+        tokenization_kwargs: Mapping[str, object],
+    ) -> bool:
+        # verl pre-expands image placeholders; if already expanded, let vLLM find them (avoid double-expansion).
+        n_img = mm_items.get_all_counts().get("image", 0)
+        if n_img:
+            processor = self.info.get_hf_processor(**hf_processor_mm_kwargs)
+            if prompt_text.count(processor.image_token) > n_img:
+                return True
+        return super()._hf_processor_applies_updates(prompt_text, mm_items, hf_processor_mm_kwargs, tokenization_kwargs)
+
     def _maybe_apply_prompt_updates(
         self,
         mm_items: MultiModalDataItems,
