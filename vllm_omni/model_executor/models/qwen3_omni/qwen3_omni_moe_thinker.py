@@ -1696,9 +1696,10 @@ class Qwen3OmniMoeThinkerForConditionalGeneration(
                 llm_pos_ids_list.append(np.broadcast_to(np.arange(text_len), (3, text_len)) + st_idx)
                 st_idx += text_len
 
-            bos_pos = np.broadcast_to(np.array([st_idx]), (3, 1))
-            llm_pos_ids_list.append(bos_pos)
-            st_idx += 1
+            if modality != "image":
+                bos_pos = np.broadcast_to(np.array([st_idx]), (3, 1))
+                llm_pos_ids_list.append(bos_pos)
+                st_idx += 1
 
             if modality == "audio":
                 audio_tokens = self._compute_audio_token_count(data["audio_feature_length"])
@@ -1723,10 +1724,7 @@ class Qwen3OmniMoeThinkerForConditionalGeneration(
 
                 image_len = grid_t * grid_h * grid_w
                 st_idx = int(llm_pos_ids_list[-1].max()) + 1
-
-                eos_pos = np.broadcast_to(np.array([st_idx]), (3, 1))
-                llm_pos_ids_list.append(eos_pos)
-                st = offset + 1 + image_len + 1
+                st = offset + image_len
 
             elif modality == "video":
                 grid_t = data["grid_t"]
