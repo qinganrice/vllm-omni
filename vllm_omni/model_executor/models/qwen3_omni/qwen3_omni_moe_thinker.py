@@ -1775,6 +1775,11 @@ class Qwen3OmniMoeThinkerForConditionalGeneration(
             )
 
         mrope_position_delta = int(llm_positions.max()) + 1 - seq_len
+        # TEMP diagnostic: rollout-side vision-position span to compare against ACTOR-TRACE.
+        import sys as _S
+        _pad_cols = [i for i, t in enumerate(input_tokens) if t == 151655]
+        _vis = llm_positions[:, _pad_cols] if _pad_cols else llm_positions[:, :0]
+        print(f"[MROPE-TRACE] seq_len={seq_len} vis_pad={len(_pad_cols)} vis_pos_span=[{int(_vis.min()) if _pad_cols else -1},{int(_vis.max()) if _pad_cols else -1}] pos_max={int(llm_positions.max())} delta={mrope_position_delta}", file=_S.stderr, flush=True)
         return torch.from_numpy(llm_positions), mrope_position_delta
 
     def get_mm_mapping(self) -> MultiModelKeys:
