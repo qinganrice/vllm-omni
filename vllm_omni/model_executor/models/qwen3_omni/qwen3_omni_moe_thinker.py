@@ -819,7 +819,7 @@ class Qwen3OmniMoeThinkerMultiModalProcessor(
             )
 
         # TEMP diagnostic: trace image placeholder layout at prompt-update exit.
-        print(f"[MM-TRACE exit] vstart={prompt_ids.count(151652)} vend={prompt_ids.count(151653)} img_pad={prompt_ids.count(151655)} len={len(prompt_ids)}", file=_S.stderr, flush=True)
+        print(f"[MM-TRACE exit] vstart={prompt_ids.count(151652)} vend={prompt_ids.count(151653)} img_pad={prompt_ids.count(151655)} len={len(prompt_ids)} head={prompt_ids[:12]} tail={prompt_ids[-12:]}", file=_S.stderr, flush=True)
         return prompt_ids, mm_placeholders
 
     def get_updates_use_audio_in_video(
