@@ -1779,7 +1779,10 @@ class Qwen3OmniMoeThinkerForConditionalGeneration(
         import sys as _S
         _pad_cols = [i for i, t in enumerate(input_tokens) if t == 151655]
         _vis = llm_positions[:, _pad_cols] if _pad_cols else llm_positions[:, :0]
-        print(f"[MROPE-TRACE] seq_len={seq_len} vis_pad={len(_pad_cols)} vis_pos_span=[{int(_vis.min()) if _pad_cols else -1},{int(_vis.max()) if _pad_cols else -1}] pos_max={int(llm_positions.max())} delta={mrope_position_delta}", file=_S.stderr, flush=True)
+        _rs = [int(_vis[r].sum()) for r in range(3)] if _pad_cols else []
+        _h3 = [tuple(int(_vis[r, c]) for r in range(3)) for c in range(min(3, len(_pad_cols)))]
+        _t3 = [tuple(int(_vis[r, c]) for r in range(3)) for c in range(max(0, len(_pad_cols) - 3), len(_pad_cols))]
+        print(f"[MROPE-TRACE] seq_len={seq_len} vis_pad={len(_pad_cols)} vis_pos_span=[{int(_vis.min()) if _pad_cols else -1},{int(_vis.max()) if _pad_cols else -1}] pos_max={int(llm_positions.max())} rowsum={_rs} head3={_h3} tail3={_t3}", file=_S.stderr, flush=True)
         return torch.from_numpy(llm_positions), mrope_position_delta
 
     def get_mm_mapping(self) -> MultiModelKeys:
